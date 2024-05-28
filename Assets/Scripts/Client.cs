@@ -23,6 +23,8 @@ public class Client : MonoBehaviour
     {
         ConnectToServer();
 
+        inputField.ActivateInputField();
+        inputField.Select();
     }
 
     private void OnEnable()
@@ -33,6 +35,28 @@ public class Client : MonoBehaviour
     private void OnDisable()
     {
         sendButton.onClick.RemoveListener(SendMessageToServer);
+    }
+
+    void Update()
+    {
+        if (stream != null && stream.DataAvailable)
+        {
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            receivevdMeeageText.text += "\n" + message;
+            Debug.Log($"서버로 부터 받은 메시지 : {message}");
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            if (!string.IsNullOrWhiteSpace(inputField.text))
+            {
+                SendMessageToServer();
+                Debug.Log("입력");
+            }
+        }
+
     }
 
 
