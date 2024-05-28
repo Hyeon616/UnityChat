@@ -61,4 +61,23 @@ class Server
         }
 
     }
+	
+    private static void BroadcastMessage(string message, TcpClient excludeClient)
+    {
+        lock (lockObject)
+        {
+            byte[] response = Encoding.UTF8.GetBytes(message);
+            foreach (TcpClient client in clients)
+            {
+                // 접속하지 못한 client가 아니라면(접속 성공한 클라이언트)
+                if (client != excludeClient)
+                {
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(response, 0, response.Length);
+                }
+
+            }
+
+        }
+    }	
 }
