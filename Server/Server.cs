@@ -28,4 +28,37 @@ class Server
         }
     }
 
+
+
+	private static void HandleClient(object obj)
+    {
+        TcpClient client = (TcpClient)obj;
+        NetworkStream stream = client.GetStream();
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+
+
+        try
+        {
+            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                Console.WriteLine("메시지 : " + message); // 메시지를 콘솔에 출력
+                BroadcastMessage(message, client);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"클라이언트 연결종료 원인 : {ex.Message}");
+        }
+        finally
+        {
+            lock (lockObject)
+            {
+                clients.Remove(client);
+                client.Close();
+            }
+        }
+
+    }
 }
