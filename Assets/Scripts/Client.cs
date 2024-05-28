@@ -25,7 +25,17 @@ public class Client : MonoBehaviour
 
     }
 
-    
+    private void OnEnable()
+    {
+        sendButton.onClick.AddListener(SendMessageToServer);
+    }
+
+    private void OnDisable()
+    {
+        sendButton.onClick.RemoveListener(SendMessageToServer);
+    }
+
+
     private void ConnectToServer()
     {
         try
@@ -40,7 +50,31 @@ public class Client : MonoBehaviour
         }
     }
 
-    
+    void SendMessageToServer()
+    {
+        if (stream != null)
+        {
+            string message = inputField.text;
+            if (!string.IsNullOrEmpty(message))
+            {
+                inputField.text = string.Empty;
+                receivevdMeeageText.text += "\n" + message;
+
+                byte[] data = Encoding.UTF8.GetBytes(message);
+                stream.Write(data, 0, data.Length);
+                Debug.Log($"서버로 전송 : {message}");
+
+                inputField.text = string.Empty;
+                inputField.ActivateInputField();
+            }
+
+        }
+        else
+        {
+            Debug.Log("메시지를 전달하지 못했습니다.");
+        }
+    }
+
     private void OnApplicationQuit()
     {
         if (stream != null)
